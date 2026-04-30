@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/*"]
+members = ["crates/*", "etna_runner"]
 resolver = "3"
 
 [workspace.package]
@@ -91,10 +91,14 @@ zero_sized_map_values = "warn"
 use_self = "warn"
 
 [profile.dev]
-panic = "abort"
+# ETNA workload override: keep `panic = "unwind"` so the runner's framework
+# adapters can catch panics from the library-under-test via
+# `std::panic::catch_unwind` and report them as counterexamples instead of
+# aborting the process. Upstream toml_edit ships `panic = "abort"`.
+panic = "unwind"
 
 [profile.release]
-panic = "abort"
+panic = "unwind"
 codegen-units = 1
 lto = true
 debug = "line-tables-only"  # requires Cargo 1.71

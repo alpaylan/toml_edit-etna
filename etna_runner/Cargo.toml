@@ -1,0 +1,16 @@
+[package]
+name = "etna_runner"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "etna"
+path = "src/bin/etna.rs"
+
+[dependencies]
+toml_edit = { path = "../crates/toml_edit", default-features = false, features = ["parse", "display"] }
+proptest = "1.5"
+quickcheck = { path = "/Users/akeles/Programming/projects/PbtBenchmark/quickcheck-rs", features = ["etna"] }
+crabcheck = { path = "/Users/akeles/Programming/projects/PbtBenchmark/crabcheck" }
+hegeltest = "0.3.7"

@@ -1,1 +1,4 @@
 target
+# ETNA workload runtime artifacts
+.hegel/
+etna.log

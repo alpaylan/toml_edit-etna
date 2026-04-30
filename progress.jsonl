@@ -1,0 +1,45 @@
+{"ts": "2026-04-30T08:55:36Z", "stage": "discover", "event": "start"}
+{"ts": "2026-04-30T08:57:50Z", "stage": "discover", "event": "candidate", "hash": "cc68ae4f", "subject": "fix(lex): Don't loop over ')' for forever"}
+{"ts": "2026-04-30T08:57:50Z", "stage": "discover", "event": "candidate", "hash": "5edb4770", "subject": "fix(parser): Don't panic on bad hex characters"}
+{"ts": "2026-04-30T08:57:50Z", "stage": "discover", "event": "candidate", "hash": "b91d460c", "subject": "fix(edit): Don't panic on inline table keys without values"}
+{"ts": "2026-04-30T08:57:50Z", "stage": "discover", "event": "candidate", "hash": "79681201", "subject": "fix(edit): On missing value, ensure a span is used"}
+{"ts": "2026-04-30T08:57:50Z", "stage": "discover", "event": "candidate", "hash": "a77c61e0", "subject": "fix(parser): Stack overflow on repeated '='"}
+{"ts": "2026-04-30T08:57:50Z", "stage": "discover", "event": "done", "commits_scanned": "3033", "fix_commits": "5"}
+{"ts": "2026-04-30T09:03:17Z", "stage": "atomize", "event": "start", "total_candidates": "5"}
+{"ts": "2026-04-30T09:03:17Z", "stage": "atomize", "event": "variant_start", "name": "lex_close_paren_loop_cc68ae4f_1", "i": "1", "of": "5"}
+{"ts": "2026-04-30T09:03:17Z", "stage": "atomize", "event": "variant_detected", "name": "lex_close_paren_loop_cc68ae4f_1", "i": "1", "of": "5", "injection": "marauders"}
+{"ts": "2026-04-30T09:03:18Z", "stage": "atomize", "event": "variant_committed", "name": "lex_close_paren_loop_cc68ae4f_1", "i": "1", "of": "5", "injection": "marauders"}
+{"ts": "2026-04-30T09:06:33Z", "stage": "atomize", "event": "variant_skipped", "name": "bad_hex_panic_85761c40", "i": "2", "of": "5", "reason": "no_observable_invariant_via_DocumentMut"}
+{"ts": "2026-04-30T09:08:26Z", "stage": "atomize", "event": "variant_committed", "name": "inline_table_no_value_panic_b91d460c_1", "i": "3", "of": "5", "injection": "marauders"}
+{"ts": "2026-04-30T09:09:44Z", "stage": "atomize", "event": "variant_committed", "name": "missing_value_no_span_panic_79681201_1", "i": "4", "of": "5", "injection": "marauders"}
+{"ts": "2026-04-30T09:11:23Z", "stage": "atomize", "event": "variant_skipped", "name": "repeated_eq_stack_overflow_a77c61e0", "i": "5", "of": "5", "reason": "stack_overflow_aborts_process"}
+{"ts": "2026-04-30T09:11:23Z", "stage": "atomize", "event": "done", "committed": "3", "skipped": "2"}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "start"}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "compiled"}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "framework_passing", "framework": "\"etna\"", "property": "\"All\""}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "framework_passing", "framework": "\"proptest\"", "property": "\"All\""}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "framework_passing", "framework": "\"quickcheck\"", "property": "\"All\""}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "framework_passing", "framework": "\"crabcheck\"", "property": "\"All\""}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "framework_passing", "framework": "\"hegel\"", "property": "\"All\""}
+{"ts": "2026-04-30T09:20:32Z", "stage": "runner", "event": "done"}
+{"ts": "2026-04-30T09:20:54Z", "stage": "document", "event": "start"}
+{"ts": "2026-04-30T09:20:59Z", "stage": "document", "event": "bugs_written", "variants": "3"}
+{"ts": "2026-04-30T09:20:59Z", "stage": "document", "event": "tasks_written", "tasks": "4"}
+{"ts": "2026-04-30T09:20:59Z", "stage": "document", "event": "done"}
+{"ts": "2026-04-30T09:20:59Z", "stage": "validate", "event": "start"}
+{"ts": "2026-04-30T09:21:05Z", "stage": "validate", "event": "check_passed", "check": "\"A. etna workload check\""}
+{"ts": "2026-04-30T09:21:26Z", "stage": "validate", "event": "check_passed", "check": "\"B1. base builds and tests\""}
+{"ts": "2026-04-30T09:22:13Z", "stage": "validate", "event": "check_passed", "check": "\"B2. per-variant detection\""}
+{"ts": "2026-04-30T09:22:39Z", "stage": "validate", "event": "check_passed", "check": "\"B3. etna binary end-to-end\""}
+{"ts": "2026-04-30T09:22:39Z", "stage": "validate", "event": "check_passed", "check": "\"B4. adapter-body reality check\""}
+{"ts": "2026-04-30T09:22:39Z", "stage": "validate", "event": "all_checks_passed"}
+{"ts": "2026-04-30T09:24:17Z", "stage": "atomize", "event": "variant_committed", "name": "malformed_array_outer_span_1b0bd028_1", "i": "6", "of": "9", "injection": "marauders"}
+{"ts": "2026-04-30T09:25:29Z", "stage": "atomize", "event": "variant_committed", "name": "malformed_inline_table_outer_span_57ea4b4f_1", "i": "7", "of": "9", "injection": "marauders"}
+{"ts": "2026-04-30T09:27:43Z", "stage": "atomize", "event": "done", "committed": "5", "skipped": "2"}
+{"ts": "2026-04-30T09:27:43Z", "stage": "document", "event": "done"}
+{"ts": "2026-04-30T09:27:43Z", "stage": "validate", "event": "check_passed", "check": "\"A. etna workload check\""}
+{"ts": "2026-04-30T09:27:43Z", "stage": "validate", "event": "check_passed", "check": "\"B1. base builds and tests\""}
+{"ts": "2026-04-30T09:27:43Z", "stage": "validate", "event": "check_passed", "check": "\"B2. per-variant detection\""}
+{"ts": "2026-04-30T09:27:43Z", "stage": "validate", "event": "check_passed", "check": "\"B3. etna binary end-to-end\""}
+{"ts": "2026-04-30T09:27:43Z", "stage": "validate", "event": "check_passed", "check": "\"B4. adapter-body reality check\""}
+{"ts": "2026-04-30T09:27:43Z", "stage": "validate", "event": "all_checks_passed"}

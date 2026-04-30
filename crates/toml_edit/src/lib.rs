@@ -93,6 +93,9 @@ mod repr;
 mod table;
 mod value;
 
+#[cfg(feature = "parse")]
+pub mod etna;
+
 #[cfg(feature = "serde")]
 pub mod de;
 #[cfg(feature = "serde")]

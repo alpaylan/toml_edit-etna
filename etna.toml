@@ -1,0 +1,145 @@
+name = "toml_edit"
+description = "toml_edit — format-preserving TOML parser/editor for Rust. ETNA workload mining bug-fix commits in toml-rs/toml."
+language = "rust"
+crate = "toml_edit"
+base_commit = "7bb8b9d7a18f234024ac3993520f8749f2041839"
+
+[[tasks]]
+mutations = ["lex_close_paren_loop_cc68ae4f_1"]
+
+[tasks.source]
+repo = "https://github.com/toml-rs/toml"
+commits = ["cc68ae4f426d48eb69be9178c28440585c0c32fc"]
+commit_subjects = ["fix(lex): Don't loop over ')' for forever"]
+issues = [1002]
+prs = [1003]
+summary = "A `)` byte was accidentally included in the lexer's `TOKEN_START` set. When `lex_atom` saw a `)`, `offset_for` returned 0 (the current position is already a token-start), nothing was consumed, and the outer iterator re-entered `lex_atom` on the same byte forever. The fix drops `)` from `TOKEN_START`."
+
+[tasks.injection]
+kind = "marauders"
+files = ["crates/toml_parser/src/lexer/mod.rs"]
+locations = [{ file = "crates/toml_parser/src/lexer/mod.rs", line = 623, symbol = "lex_atom" }]
+
+[tasks.bug]
+short_name = "lex_close_paren_loop"
+invariant = "Lexing any string input — well-formed or malformed TOML — terminates in time bounded by the input length. In particular, parsing a document that contains a `)` byte must complete and either return `Ok(_)` or report a parse error."
+how_triggered = "The mutation re-adds `)` to `TOKEN_START`. Once the byte stream reaches a `)`, `offset_for(|b| TOKEN_START.contains_token(b))` returns 0 (the current byte is already a token-start), `next_slice(0)` is a no-op, and `Lexer::next` re-invokes `lex_atom` on the same `)` indefinitely — the parser never returns."
+
+[[tasks.tasks]]
+property = "ParseTerminates"
+witnesses = [
+  { test_fn = "witness_parse_terminates_case_close_paren_atom" },
+  { test_fn = "witness_parse_terminates_case_lonely_close_paren" },
+]
+
+[[tasks]]
+mutations = ["inline_table_no_value_panic_b91d460c_1"]
+
+[tasks.source]
+repo = "https://github.com/toml-rs/toml"
+commits = ["b91d460cc8584110c95d8eb7fcb2f45f86b6b14a"]
+commit_subjects = ["fix(edit): Don't panic on inline table keys without values"]
+summary = "When an unclosed inline table reached EOF in `NeedsEquals` or `NeedsValue` state, the parser jumped straight to `inline_table_close` without first emitting the missing key-val-sep / scalar events. Downstream the toml_edit value receiver tripped a `set_prefix` assertion (`setting a value should set a prefix`) and panicked. The fix synthesises stub events for whichever state we're in before reporting the unclosed-table error."
+
+[tasks.injection]
+kind = "marauders"
+files = ["crates/toml_parser/src/parser/document.rs"]
+locations = [{ file = "crates/toml_parser/src/parser/document.rs", line = 1239, symbol = "on_inline_table_open" }]
+
+[tasks.bug]
+short_name = "inline_table_no_value_panic"
+invariant = "Parsing any string input — well-formed or malformed TOML — returns a `Result`, never panics. In particular, the parser must not abort the process on truncated inline tables that end mid-`{ key =`."
+how_triggered = "The mutation discards the state-dispatch match that synthesises the missing key/value events. Once an inline table reaches EOF in `NeedsValue` (e.g. `={=<=u==`), `inline_table_close` is emitted without a preceding scalar; toml_edit's `on_value` receiver panics with `setting a value should set a prefix`."
+
+[[tasks.tasks]]
+property = "ParseDoesNotPanic"
+witnesses = [
+  { test_fn = "witness_parse_does_not_panic_case_inline_table_no_value" },
+]
+
+[[tasks]]
+mutations = ["missing_value_no_span_panic_79681201_1"]
+
+[tasks.source]
+repo = "https://github.com/toml-rs/toml"
+commits = ["796812017df0f118130423e5109803a1742b62c5"]
+commit_subjects = ["fix(edit): On missing value, ensure a span is used"]
+prs = [1101]
+issues = [1100]
+summary = "When the value parser reached EOF without consuming any event, it returned `Value::from(0)` as a placeholder. That value has no `Repr`, so downstream code relying on `set_prefix` / `.span()` (e.g. document.rs:547) panicked with 'all items have spans'. The fix synthesises an empty-span `RawString::with_span(0..0)` and wraps the placeholder integer with it."
+
+[tasks.injection]
+kind = "marauders"
+files = ["crates/toml_edit/src/parser/value.rs"]
+locations = [{ file = "crates/toml_edit/src/parser/value.rs", line = 58, symbol = "value" }]
+
+[tasks.bug]
+short_name = "missing_value_no_span_panic"
+invariant = "Parsing any string input — well-formed or malformed — returns a `Result`, never panics. Even when the value parser produces a placeholder fallback for a malformed key/value pair, the placeholder must carry a `Repr` so callers that read its span do not assertion-panic."
+how_triggered = "The mutation reverts the placeholder to `Value::from(0)`, which omits the `Repr`. On `==\\n[._[._` the parser hits the EOF branch in `value()` and returns a span-less integer; the table builder later asserts `all items have spans` (document.rs:547) and panics."
+
+[[tasks.tasks]]
+property = "ParseDoesNotPanic"
+witnesses = [
+  { test_fn = "witness_parse_does_not_panic_case_missing_value_no_span" },
+]
+
+[[tasks]]
+mutations = ["malformed_array_outer_span_1b0bd028_1"]
+
+[tasks.source]
+repo = "https://github.com/toml-rs/toml"
+commits = ["1b0bd028f6695ad8314de816787eb041553685eb"]
+commit_subjects = ["fix(edit): Preserve outer spans for malformed arrays"]
+summary = "When `on_array` exited the parsing loop without seeing a real `ArrayClose` event (e.g. nested malformed inline-table inside an array), `result.span` was left as `None`. Downstream code that asserts `all items have spans` then panicked. The fix tracks the most recently consumed event's span and synthesises an outer span covering open..last when no clean close was observed."
+
+[tasks.injection]
+kind = "marauders"
+files = ["crates/toml_edit/src/parser/array.rs"]
+locations = [{ file = "crates/toml_edit/src/parser/array.rs", line = 80, symbol = "on_array" }]
+
+[tasks.bug]
+short_name = "malformed_array_outer_span"
+invariant = "Parsing any string input — well-formed or malformed — returns a `Result`, never panics. In particular, a malformed array followed by another malformed token must not leave the surrounding `Array::span` unset, since downstream consumers assume every emitted item has a span."
+how_triggered = "The mutation drops the `if result.span.is_none() { result.span = Some(open..close) }` fallback. On `a=[{[]-]{\\na.` the parser exits `on_array` after a nested malformed inline table without ever seeing `]`; `result.span` stays `None` and the table builder later asserts `all items have spans`, panicking the parse."
+
+[[tasks.tasks]]
+property = "ParseDoesNotPanic"
+witnesses = [
+  { test_fn = "witness_parse_does_not_panic_case_malformed_array_outer_span" },
+]
+
+[[tasks]]
+mutations = ["malformed_inline_table_outer_span_57ea4b4f_1"]
+
+[tasks.source]
+repo = "https://github.com/toml-rs/toml"
+commits = ["57ea4b4f2adbb12f1fbb30ed7c45ac60e5493a31"]
+commit_subjects = ["fix(edit): Preserve outer spans for malformed inline tables"]
+summary = "Same shape as the malformed-array fix but for inline tables: when `on_inline_table` exited the parsing loop without seeing a clean `InlineTableClose` (e.g. an inline table that contained a malformed array and a CRLF), `result.span` was left as `None`. The downstream `all items have spans` assertion then panicked. The fix tracks the most recently consumed event's span and synthesises an outer span when no clean close was observed."
+
+[tasks.injection]
+kind = "marauders"
+files = ["crates/toml_edit/src/parser/inline_table.rs"]
+locations = [{ file = "crates/toml_edit/src/parser/inline_table.rs", line = 87, symbol = "on_inline_table" }]
+
+[tasks.bug]
+short_name = "malformed_inline_table_outer_span"
+invariant = "Parsing any string input — well-formed or malformed — returns a `Result`, never panics. A malformed inline table that aborts mid-parse must not leave `InlineTable::span` unset, since downstream consumers assume every emitted item has a span."
+how_triggered = "The mutation drops the `if result.span.is_none() { result.span = Some(open..close) }` fallback. On `={[]\\r].` the parser exits `on_inline_table` after a nested malformed array without ever seeing `}`; `result.span` stays `None` and the table builder later asserts `all items have spans`, panicking the parse."
+
+[[tasks.tasks]]
+property = "ParseDoesNotPanic"
+witnesses = [
+  { test_fn = "witness_parse_does_not_panic_case_malformed_inline_table_outer_span" },
+]
+
+[[dropped]]
+commit = "85761c40"
+subject = "fix(parser): Avoid panic"
+reason = "no observable invariant via DocumentMut: the hex/oct/bin decoder panic is reached only by toml_parser::parse_document tests; toml_edit's value path returns Err before tripping the assertion"
+
+[[dropped]]
+commit = "a77c61e0"
+subject = "fix(parser): Stack overflow on repeated '='"
+reason = "irreducibly nondeterministic abort: the bug aborts the worker process via SIGSEGV on stack overflow, which catch_unwind cannot intercept and which kills the whole runner; safely detecting it would require a per-call subprocess harness"
