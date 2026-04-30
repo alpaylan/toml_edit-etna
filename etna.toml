@@ -1,6 +1,7 @@
 name = "toml_edit"
 description = "toml_edit — format-preserving TOML parser/editor for Rust. ETNA workload mining bug-fix commits in toml-rs/toml."
 language = "rust"
+strategies = ["proptest", "quickcheck", "crabcheck", "hegel"]
 crate = "toml_edit"
 base_commit = "7bb8b9d7a18f234024ac3993520f8749f2041839"
 
