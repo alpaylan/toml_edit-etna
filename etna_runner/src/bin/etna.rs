@@ -131,9 +131,13 @@ fn run_proptest_one<F>(body: F, counter: Arc<AtomicU64>) -> Result<(), String>
 where
     F: Fn(String) -> PropertyResult + 'static,
 {
+    // Cases set to u32::MAX so the test budget is effectively unbounded —
+    // etna's per-trial wall-clock timeout governs trial duration. Without
+    // this, 200-case runs exhaust their budget without finding the bug
+    // and report `passed`, which is misleading for canary mutations.
     let mut runner = TestRunner::new(ProptestConfig {
-        cases: 200,
-        max_global_rejects: 10000,
+        cases: u32::MAX,
+        max_global_rejects: u32::MAX,
         ..ProptestConfig::default()
     });
     let strategy = proptest::collection::vec(any::<u8>(), 0..1024)
@@ -244,13 +248,13 @@ fn run_quickcheck_property(property: &str) -> Outcome {
     let t0 = Instant::now();
     let result = match property {
         "ParseTerminates" => QuickCheck::new()
-            .tests(200)
-            .max_tests(1000)
+            .tests(u64::MAX)
+            .max_tests(u64::MAX)
             .max_time(Duration::from_secs(86_400))
             .quicktest(qc_parse_terminates as fn(TomlByteVec) -> TestResult),
         "ParseDoesNotPanic" => QuickCheck::new()
-            .tests(200)
-            .max_tests(1000)
+            .tests(u64::MAX)
+            .max_tests(u64::MAX)
             .max_time(Duration::from_secs(86_400))
             .quicktest(qc_parse_does_not_panic as fn(TomlByteVec) -> TestResult),
         _ => {
@@ -309,7 +313,7 @@ fn run_crabcheck_property(property: &str) -> Outcome {
     }
     CC_COUNTER.store(0, Ordering::Relaxed);
     let t0 = Instant::now();
-    let cfg = cc::Config { tests: 200 };
+    let cfg = cc::Config { tests: u64::MAX };
     let result = match property {
         "ParseTerminates" => cc::quickcheck_with_config(
             cfg,
@@ -354,7 +358,7 @@ static HG_COUNTER: AtomicU64 = AtomicU64::new(0);
 fn hegel_settings() -> HegelSettings {
     use hegel::HealthCheck;
     HegelSettings::new()
-        .test_cases(200)
+        .test_cases(u64::MAX)
         .suppress_health_check(HealthCheck::all())
 }
 
