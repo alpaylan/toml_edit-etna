@@ -1236,7 +1236,6 @@ fn on_inline_table_open(
         })
         .map(|t| t.span())
         .unwrap_or_default();
-    /*| inline_table_no_value_panic [etna] */
     match state {
         State::NeedsKey => {}
         State::NeedsEquals => {
@@ -1248,11 +1247,6 @@ fn on_inline_table_open(
         }
         State::NeedsComma => {}
     }
-    /*|| inline_table_no_value_panic_b91d460c_1 */
-    /*|
-    let _ = state;
-    */
-    /* |*/
     error.report_error(
         ParseError::new("unclosed inline table")
             .with_context(inline_table_open.span())

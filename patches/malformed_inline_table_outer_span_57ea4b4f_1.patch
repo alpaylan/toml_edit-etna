@@ -1,0 +1,15 @@
+# marauders: name=malformed_inline_table_outer_span tags=[etna]
+diff --git a/crates/toml_edit/src/parser/inline_table.rs b/crates/toml_edit/src/parser/inline_table.rs
+--- a/crates/toml_edit/src/parser/inline_table.rs
++++ b/crates/toml_edit/src/parser/inline_table.rs
+@@ -83,9 +83,7 @@
+             }
+         }
+     }
+-    if result.span.is_none() {
+-        result.span = Some(open_event.span().start()..close_span.end());
+-    }
++    let _ = close_span;
+ 
+     Value::InlineTable(result)
+ }

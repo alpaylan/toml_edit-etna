@@ -1,0 +1,13 @@
+# marauders: name=lex_close_paren_loop tags=[etna]
+diff --git a/crates/toml_parser/src/lexer/mod.rs b/crates/toml_parser/src/lexer/mod.rs
+--- a/crates/toml_parser/src/lexer/mod.rs
++++ b/crates/toml_parser/src/lexer/mod.rs
+@@ -620,7 +620,7 @@
+     let start = stream.current_token_start();
+ 
+     // Intentionally leaves off quotes in case the opening quote was missing
+-    let token_start : & [u8] = b".=,[]{} \t#\r\n";
++    let token_start : & [u8] = b".=,[]{} \t#\r\n)";
+     let offset = stream
+         .as_bstr()
+         .offset_for(|b| token_start.contains_token(b))

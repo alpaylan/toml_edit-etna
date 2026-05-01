@@ -1,0 +1,15 @@
+# marauders: name=malformed_array_outer_span tags=[etna]
+diff --git a/crates/toml_edit/src/parser/array.rs b/crates/toml_edit/src/parser/array.rs
+--- a/crates/toml_edit/src/parser/array.rs
++++ b/crates/toml_edit/src/parser/array.rs
+@@ -76,9 +76,7 @@
+             }
+         }
+     }
+-    if result.span.is_none() {
+-        result.span = Some(open_event.span().start()..close_span.end());
+-    }
++    let _ = close_span;
+ 
+     Value::Array(result)
+ }

@@ -83,15 +83,9 @@ pub(crate) fn on_inline_table(
             }
         }
     }
-    /*| malformed_inline_table_outer_span [etna] */
     if result.span.is_none() {
         result.span = Some(open_event.span().start()..close_span.end());
     }
-    /*|| malformed_inline_table_outer_span_57ea4b4f_1 */
-    /*|
-    let _ = close_span;
-    */
-    /* |*/
 
     Value::InlineTable(result)
 }

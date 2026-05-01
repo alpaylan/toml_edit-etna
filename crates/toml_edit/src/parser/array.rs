@@ -76,15 +76,9 @@ pub(crate) fn on_array(
             }
         }
     }
-    /*| malformed_array_outer_span [etna] */
     if result.span.is_none() {
         result.span = Some(open_event.span().start()..close_span.end());
     }
-    /*|| malformed_array_outer_span_1b0bd028_1 */
-    /*|
-    let _ = close_span;
-    */
-    /* |*/
 
     Value::Array(result)
 }
