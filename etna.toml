@@ -17,7 +17,8 @@ prs = [1003]
 summary = "A `)` byte was accidentally included in the lexer's `TOKEN_START` set. When `lex_atom` saw a `)`, `offset_for` returned 0 (the current position is already a token-start), nothing was consumed, and the outer iterator re-entered `lex_atom` on the same byte forever. The fix drops `)` from `TOKEN_START`."
 
 [tasks.injection]
-kind = "marauders"
+kind = "patch"
+patch = "patches/lex_close_paren_loop_cc68ae4f_1.patch"
 files = ["crates/toml_parser/src/lexer/mod.rs"]
 locations = [{ file = "crates/toml_parser/src/lexer/mod.rs", line = 623, symbol = "lex_atom" }]
 
@@ -43,7 +44,8 @@ commit_subjects = ["fix(edit): Don't panic on inline table keys without values"]
 summary = "When an unclosed inline table reached EOF in `NeedsEquals` or `NeedsValue` state, the parser jumped straight to `inline_table_close` without first emitting the missing key-val-sep / scalar events. Downstream the toml_edit value receiver tripped a `set_prefix` assertion (`setting a value should set a prefix`) and panicked. The fix synthesises stub events for whichever state we're in before reporting the unclosed-table error."
 
 [tasks.injection]
-kind = "marauders"
+kind = "patch"
+patch = "patches/inline_table_no_value_panic_b91d460c_1.patch"
 files = ["crates/toml_parser/src/parser/document.rs"]
 locations = [{ file = "crates/toml_parser/src/parser/document.rs", line = 1239, symbol = "on_inline_table_open" }]
 
@@ -70,7 +72,8 @@ issues = [1100]
 summary = "When the value parser reached EOF without consuming any event, it returned `Value::from(0)` as a placeholder. That value has no `Repr`, so downstream code relying on `set_prefix` / `.span()` (e.g. document.rs:547) panicked with 'all items have spans'. The fix synthesises an empty-span `RawString::with_span(0..0)` and wraps the placeholder integer with it."
 
 [tasks.injection]
-kind = "marauders"
+kind = "patch"
+patch = "patches/missing_value_no_span_panic_79681201_1.patch"
 files = ["crates/toml_edit/src/parser/value.rs"]
 locations = [{ file = "crates/toml_edit/src/parser/value.rs", line = 58, symbol = "value" }]
 
@@ -95,7 +98,8 @@ commit_subjects = ["fix(edit): Preserve outer spans for malformed arrays"]
 summary = "When `on_array` exited the parsing loop without seeing a real `ArrayClose` event (e.g. nested malformed inline-table inside an array), `result.span` was left as `None`. Downstream code that asserts `all items have spans` then panicked. The fix tracks the most recently consumed event's span and synthesises an outer span covering open..last when no clean close was observed."
 
 [tasks.injection]
-kind = "marauders"
+kind = "patch"
+patch = "patches/malformed_array_outer_span_1b0bd028_1.patch"
 files = ["crates/toml_edit/src/parser/array.rs"]
 locations = [{ file = "crates/toml_edit/src/parser/array.rs", line = 80, symbol = "on_array" }]
 
@@ -120,7 +124,8 @@ commit_subjects = ["fix(edit): Preserve outer spans for malformed inline tables"
 summary = "Same shape as the malformed-array fix but for inline tables: when `on_inline_table` exited the parsing loop without seeing a clean `InlineTableClose` (e.g. an inline table that contained a malformed array and a CRLF), `result.span` was left as `None`. The downstream `all items have spans` assertion then panicked. The fix tracks the most recently consumed event's span and synthesises an outer span when no clean close was observed."
 
 [tasks.injection]
-kind = "marauders"
+kind = "patch"
+patch = "patches/malformed_inline_table_outer_span_57ea4b4f_1.patch"
 files = ["crates/toml_edit/src/parser/inline_table.rs"]
 locations = [{ file = "crates/toml_edit/src/parser/inline_table.rs", line = 87, symbol = "on_inline_table" }]
 

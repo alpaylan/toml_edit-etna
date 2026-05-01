@@ -55,16 +55,10 @@ pub(crate) fn value(
         }
     }
 
-    /*| missing_value_no_span_panic [etna] */
     let value_raw = RawString::with_span(0..0);
     let mut f = Formatted::new(0);
     f.set_repr_unchecked(Repr::new_unchecked(value_raw));
     Value::Integer(f)
-    /*|| missing_value_no_span_panic_79681201_1 */
-    /*|
-    Value::from(0)
-    */
-    /* |*/
 }
 
 pub(crate) fn on_scalar(

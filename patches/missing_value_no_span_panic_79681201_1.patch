@@ -1,0 +1,16 @@
+# marauders: name=missing_value_no_span_panic tags=[etna]
+diff --git a/crates/toml_edit/src/parser/value.rs b/crates/toml_edit/src/parser/value.rs
+--- a/crates/toml_edit/src/parser/value.rs
++++ b/crates/toml_edit/src/parser/value.rs
+@@ -55,10 +55,7 @@
+         }
+     }
+ 
+-    let value_raw = RawString::with_span(0..0);
+-    let mut f = Formatted::new(0);
+-    f.set_repr_unchecked(Repr::new_unchecked(value_raw));
+-    Value::Integer(f)
++    Value::from(0)
+ }
+ 
+ pub(crate) fn on_scalar(

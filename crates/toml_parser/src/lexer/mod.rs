@@ -620,13 +620,7 @@ fn lex_atom(stream: &mut Stream<'_>) -> Token {
     let start = stream.current_token_start();
 
     // Intentionally leaves off quotes in case the opening quote was missing
-    /*| lex_close_paren_loop [etna] */
     let token_start : & [u8] = b".=,[]{} \t#\r\n";
-    /*|| lex_close_paren_loop_cc68ae4f_1 */
-    /*|
-    let token_start : & [u8] = b".=,[]{} \t#\r\n)";
-    */
-    /* |*/
     let offset = stream
         .as_bstr()
         .offset_for(|b| token_start.contains_token(b))
