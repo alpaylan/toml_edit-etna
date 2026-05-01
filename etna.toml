@@ -29,6 +29,8 @@ how_triggered = "The mutation re-adds `)` to `TOKEN_START`. Once the byte stream
 
 [[tasks.tasks]]
 property = "ParseTerminates"
+inactive = true
+reason = "Buggy variant infinite-loops the lexer on `)` inputs; the runner OOMs in ~30s before etna's 60s per-trial timeout can SIGTERM the trial (exit 143). Re-enable once the etna_runner wraps each property call in a thread-level hard timeout."
 witnesses = [
   { test_fn = "witness_parse_terminates_case_close_paren_atom" },
   { test_fn = "witness_parse_terminates_case_lonely_close_paren" },
