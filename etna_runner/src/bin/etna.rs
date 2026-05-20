@@ -77,15 +77,35 @@ fn bytes_to_toml_str(bytes: &[u8]) -> String {
 }
 
 // ----- Canonical witnesses (tool=etna) --------------------------------------
+//
+// Each property is shared across multiple mutations; running a single
+// witness would only trigger one of them in the etna mode. Each `check_*`
+// runs every distinct witness for its property and fails if any one of
+// them violates the contract.
 
 fn check_parse_terminates() -> Result<(), String> {
-    // mirrors witness_parse_terminates_case_close_paren_atom
-    to_err(property_parse_terminates("key = a)b\n".to_string()))
+    // Mirrors crates/toml_edit/src/etna.rs `witness_parse_terminates_*`.
+    let inputs = ["key = a)b\n", ")\n"];
+    for s in inputs {
+        to_err(property_parse_terminates(s.to_string()))?;
+    }
+    Ok(())
 }
 
 fn check_parse_does_not_panic() -> Result<(), String> {
-    // mirrors witness_parse_does_not_panic_case_inline_table_no_value
-    to_err(property_parse_does_not_panic("={=<=u==".to_string()))
+    // Mirrors crates/toml_edit/src/etna.rs `witness_parse_does_not_panic_*`.
+    // Each input targets a distinct mutation; etna mode must fail if any
+    // of them panics, so we feed every witness through the property.
+    let inputs = [
+        "={=<=u==",        // inline_table_no_value_panic_b91d460c_1
+        "==\n[._[._",      // missing_value_no_span_panic_79681201_1
+        "a=[{[]-]{\na.",   // malformed_array_outer_span_1b0bd028_1
+        "={[]\r].",        // malformed_inline_table_outer_span_57ea4b4f_1
+    ];
+    for s in inputs {
+        to_err(property_parse_does_not_panic(s.to_string()))?;
+    }
+    Ok(())
 }
 
 // ============================================================================
